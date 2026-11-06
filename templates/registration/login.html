@@ -1,70 +1,268 @@
+
 {% extends 'registration/registration_base.html' %}
 {% load i18n %}
-{% block title %}{% trans 'Dj Learning Management System - Login' %}{% endblock title %}
-{% load crispy_forms_tags %}
-{% block content %}
 
-<div class="col-md-4 mx-auto mt-5">
-  <div class="card">
-    <div class="form-title">
-      <i class="fas fa-lock me-2"></i>
-      {% trans 'Sign in' %}
+{% block title %}SkyLearn | Sign In{% endblock title %}
+
+{% block content %}
+<style>
+  .skylearn-login {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+
+  .skylearn-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 42px 36px;
+    background: #ffffff;
+    border: 1px solid #e7edf5;
+    border-radius: 20px;
+    box-shadow: 0 20px 65px rgba(20, 39, 77, .12);
+  }
+
+  .skylearn-brand {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .skylearn-logo {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    color: white;
+    font-size: 26px;
+  }
+
+  .skylearn-brand h1 {
+    font-size: 29px;
+    font-weight: 750;
+    color: #14213d;
+    margin-bottom: 8px;
+  }
+
+  .skylearn-brand p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .skylearn-field {
+    margin-bottom: 22px;
+  }
+
+  .skylearn-field label {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .skylearn-input {
+    width: 100%;
+    height: 50px;
+    padding: 0 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #0f172a;
+    outline: none;
+    transition: .2s;
+  }
+
+  .skylearn-input:focus {
+    background: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+  }
+
+  .skylearn-password {
+    position: relative;
+  }
+
+  .skylearn-password input {
+    padding-right: 75px;
+  }
+
+  .skylearn-toggle {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    border: none;
+    background: transparent;
+    color: #2563eb;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .skylearn-error {
+    padding: 12px;
+    margin-bottom: 18px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 9px;
+    color: #b91c1c;
+    font-size: 13px;
+  }
+
+  .skylearn-submit {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(100deg, #2563eb, #1d4ed8);
+    color: white;
+    font-size: 15px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: .2s;
+  }
+
+  .skylearn-submit:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  .skylearn-submit:disabled {
+    opacity: .7;
+    cursor: wait;
+  }
+
+  .skylearn-footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .skylearn-footer a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .skylearn-footer a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 480px) {
+    .skylearn-card {
+      padding: 30px 22px;
+    }
+  }
+</style>
+
+<div class="skylearn-login">
+  <div class="skylearn-card">
+
+    <div class="skylearn-brand">
+      <div class="skylearn-logo">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h1>Welcome to SkyLearn</h1>
+      <p>Sign in to your learning dashboard</p>
     </div>
-    <div class="card-body">
-        <form action="" method="POST" id="login-form">{% csrf_token %}
-          <div class="form-group mb-3">
-              <label class="mb-2" for="username_id"><i class="fas fa-address-card me-2"></i>{% trans 'ID Number' %}</label>
-              <input type="text" name="username" id="username_id" class="form-control" required>
-              <div id="message-wrapper"></div>
-          </div>
-          <div class="form-group mb-3">
-              <label class="mb-2" for="password_id"><i class="fas fa-key me-2"></i>{% trans 'Password' %}</label>
-              <input type="password" name="password" id="password_id" class="form-control" required>
-          </div>
-          {% if form.errors %}
-                <span class="text-danger"><i class="fas fa-exclamation-circle"></i> {% trans 'Invalid ID & Password.' %}</span><br>
-          {% endif %}
-      
-          <button type="submit" class="btn btn-primary" id="login-btn"><i class="fas fa-sign-in-alt"></i><small>{% trans 'SIGN IN' %}</small></button>
-        </form>
-        <br>
-        <div class="login-bottom">
-          <a href="{% url 'password_reset' %}" class="link">{% trans 'Forgot password ?' %}</a>
+
+    <form method="POST" id="login-form" action="">
+      {% csrf_token %}
+
+      <div class="skylearn-field">
+        <label for="username_id">Username</label>
+        <input
+          type="text"
+          name="username"
+          id="username_id"
+          class="skylearn-input"
+          placeholder="Enter your username"
+          autocomplete="username"
+          value="{{ form.username.value|default_if_none:'' }}"
+          required
+        >
+      </div>
+
+      <div class="skylearn-field">
+        <label for="password_id">Password</label>
+
+        <div class="skylearn-password">
+          <input
+            type="password"
+            name="password"
+            id="password_id"
+            class="skylearn-input"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
+
+          <button
+            type="button"
+            class="skylearn-toggle"
+            id="toggle-password"
+            aria-label="Show password"
+            aria-pressed="false"
+          >Show</button>
         </div>
       </div>
+
+      {% if form.errors %}
+        <div class="skylearn-error" role="alert">
+          <i class="fas fa-exclamation-circle"></i>
+          Invalid username or password. Please try again.
+        </div>
+      {% endif %}
+
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      <button type="submit" class="skylearn-submit" id="login-btn">
+        Sign In
+        <i class="fas fa-arrow-right ms-2"></i>
+      </button>
+    </form>
+
+    <div class="skylearn-footer">
+      <a href="{% url 'password_reset' %}">
+        Forgot your password?
+      </a>
+    </div>
+
   </div>
 </div>
 {% endblock content %}
 
 {% block js %}
-
 <script>
-  $('#login-form').submit(function (e) {
-    // e.preventDefault();
-    $('#login-btn').addClass('disabled')
-    $('#login-btn').html(`<i class="fas fa-sign-in-alt"></i> Signining you in . . .`)
-  })
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("login-form");
+  const submit = document.getElementById("login-btn");
+  const password = document.getElementById("password_id");
+  const toggle = document.getElementById("toggle-password");
 
-  $("#username").on("input", function () {
-    username = $(this).val();
+  toggle.addEventListener("click", function () {
+    const visible = password.type === "password";
+    password.type = visible ? "text" : "password";
+    toggle.textContent = visible ? "Hide" : "Show";
+    toggle.setAttribute("aria-pressed", String(visible));
+    toggle.setAttribute(
+      "aria-label",
+      visible ? "Hide password" : "Show password"
+    );
+  });
 
-    $.ajax({
-      url: "/accounts/ajax/validate-username/",
-      data: {
-        username: username
-      },
-      dataType: 'json',
-      success: function (data) {
-        if (data.is_taken) {
-          console.log(data.is_taken);
-          $('#message-wrapper').html(`<p class="my-2 text-danger"><span class="bg-error p-2"><b>${username}</b> already taken :( try another one </span></p>`)
-        }
-        else {
-          $('#message-wrapper').html(`<p class="my-2 text-success"><span class="bg-correct p-2"><b>${username}</b> is valid </span></p>`)
-        }
-      }
-
-    })
-  })
+  form.addEventListener("submit", function () {
+    submit.disabled = true;
+    submit.textContent = "Signing in...";
+  });
+});
 </script>
-{% endblock %}
+{% endblock js %}

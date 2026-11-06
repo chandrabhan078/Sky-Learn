@@ -1,116 +1,723 @@
+
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %} {{ title }} | {% trans 'Learning management system' %}{% endblock title %}
-
 {% load static %}
 
+{% block title %}My Profile | SkyLearn{% endblock title %}
 
 {% block content %}
 
 {% if user.is_authenticated %}
 
-<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/">{% trans 'Home' %}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{ user.get_full_name }}</li>
-    </ol>
-</nav>
+<style>
+/* ===== SKYLEARN PROFILE THEME ===== */
 
-{% include 'snippets/messages.html' %}
+.profile-page {
+    padding: 22px 12px 40px;
+    color: #1e293b;
+}
 
-<div class="row">
+.profile-page .breadcrumb {
+    background: transparent;
+    margin-bottom: 22px;
+}
 
-    <div class="col-md-3 mx-auto">
-        <div class="card  p-2">
-            <div class="text-center">
-                <img src="{{ user.picture.url }}" class="w-100">
-                <ul class="px-2 list-unstyled">
-                    <li>{{ user.get_full_name|title }}</li>
-                    <li><strong>{% trans 'Last login:' %} </strong>{{ user.last_login|date }}</li>
-                    <li><strong>{% trans 'Role:' %} </strong>
-                        {{ user.get_user_role }}
-                    </li>
-                </ul>
-            </div>
-            <hr>
-            <a class="mb-2" href="{% url 'edit_profile' %}"><i class="fas fa-user-edit unstyled"></i>
-                <span class="mobile-hide">{% trans 'Edit Profile' %}</span></a>
-            <a href="{% url 'change_password' %}"><i class="fas fa-lock unstyled"></i><span class="mobile-hide">
-                {% trans 'Change password' %}</span></a>
-        </div>
-    </div>
+.profile-page .breadcrumb a {
+    color: #2563eb;
+    text-decoration: none;
+}
 
-    <div class="col-md-9 mx-auto">
-        <div class="card">
-            <div class="card-body">
-                <!-- {% if user.is_student %}
-                <p class="form-title"><i class="fas fa-book-open"></i>Enrolled Courses</p>
-                <div class="dashboard-description">
-                    {% if courses %}
-                        <div class="flex">
-                            {% for course in courses %}
-                                <div class="flex"><a class="edit-btn" href="{{ course.get_absolute_url }}">{{ course }}</a></div>
-                            {% endfor %}
-                        </div>
+.profile-page .profile-card {
+    background: #fff;
+    border: 1px solid #e8edf5;
+    border-radius: 16px;
+    box-shadow: 0 5px 22px rgba(15, 23, 42, .045);
+    overflow: hidden;
+    margin-bottom: 22px;
+}
+
+.profile-header {
+    background: linear-gradient(120deg, #172554, #1d4ed8);
+    height: 115px;
+}
+
+.profile-avatar {
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+    border: 5px solid white;
+    background: #eaf1ff;
+    object-fit: cover;
+    margin-top: -65px;
+    position: relative;
+}
+
+.profile-avatar-placeholder {
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+    border: 5px solid white;
+    background: #eaf1ff;
+    color: #2563eb;
+    margin: -65px auto 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
+
+.profile-user-info {
+    padding: 12px 20px 22px;
+    text-align: center;
+}
+
+.profile-user-info h3 {
+    font-size: 22px;
+    font-weight: 750;
+    color: #172554;
+    margin: 8px 0 5px;
+}
+
+.profile-user-info p {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 9px;
+}
+
+.profile-role {
+    display: inline-block;
+    padding: 6px 15px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.profile-actions {
+    border-top: 1px solid #edf0f5;
+    padding: 15px 20px;
+}
+
+.profile-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: #334155;
+    text-decoration: none !important;
+    border-radius: 9px;
+    font-size: 14px;
+    transition: .2s;
+}
+
+.profile-action i {
+    color: #2563eb;
+    width: 20px;
+    font-size: 16px;
+}
+
+.profile-action:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.profile-section {
+    padding: 24px;
+}
+
+.profile-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.profile-section-title .section-icon {
+    width: 40px;
+    height: 40px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 17px;
+}
+
+.profile-section-title h5 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: #172554;
+}
+
+.profile-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.profile-info-item {
+    background: #f8fafc;
+    border: 1px solid #edf1f6;
+    border-radius: 11px;
+    padding: 15px;
+    min-width: 0;
+}
+
+.profile-info-item .info-label {
+    color: #64748b;
+    font-size: 12px;
+    margin-bottom: 7px;
+    display: block;
+}
+
+.profile-info-item .info-value {
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.profile-divider {
+    border: 0;
+    border-top: 1px solid #edf0f5;
+    margin: 0;
+}
+
+.profile-course {
+    display: block;
+    padding: 13px 15px;
+    background: #f8fafc;
+    border: 1px solid #edf1f6;
+    border-radius: 10px;
+    color: #2563eb;
+    text-decoration: none !important;
+    margin-bottom: 10px;
+    transition: .2s;
+}
+
+.profile-course:hover {
+    background: #eff6ff;
+    transform: translateX(3px);
+}
+
+.profile-empty {
+    color: #64748b;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.profile-footer {
+    color: #94a3b8;
+    text-align: center;
+    font-size: 12px;
+    padding: 18px;
+}
+
+@media (max-width: 767px) {
+    .profile-page {
+        padding: 12px 5px 25px;
+    }
+
+    .profile-section {
+        padding: 18px;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+
+<div class="profile-page">
+
+    <!-- BREADCRUMB -->
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/">{% trans 'Home' %}</a>
+            </li>
+            <li class="breadcrumb-item active">
+                {% trans 'My Profile' %}
+            </li>
+        </ol>
+    </nav>
+
+    {% include 'snippets/messages.html' %}
+
+
+    <div class="row">
+
+        <!-- LEFT PROFILE CARD -->
+
+        <div class="col-lg-4 col-xl-3">
+
+            <div class="profile-card">
+
+                <div class="profile-header"></div>
+
+                <div class="profile-user-info">
+
+                    {% if user.picture %}
+                        <img
+                            src="{{ user.picture.url }}"
+                            class="profile-avatar"
+                            alt="Profile picture"
+                        >
                     {% else %}
-                            <div class="text-danger"><i class="far fa-frown"></i>No courses!</div>
+                        <div class="profile-avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
                     {% endif %}
-                </div>
-                {% endif %} -->
-    
-                {% if user.is_lecturer %}
-                <p class="fw-bold"><i class="fas fa-book-open"></i> {% trans 'My Courses' %}</p>
-                {% if courses %}
-                <ul>
-                    {% for course in courses %}
-                    <li><a href="{{ course.get_absolute_url }}" class="text-primary">{{ course }}</a></li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="text-danger">{% trans 'No courses assigned!' %}</div>
-                {% endif %}
-                <hr>
-                {% endif %}
-    
-                <p class="fw-bold"><i class="me-2 fas fa-user"></i>{% trans 'Personal Info' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'First Name:' %}</strong> {{ user.first_name|title }}</p>
-                    <p><strong>{% trans 'Last Name:' %}</strong> {{ user.last_name|title }}</p>
-                    <p><strong>{% trans 'ID No.:' %}</strong> {{ user.username }}</p>
-                </div>
-                {% if user.is_student %}
-                <hr>
-                <p class="fw-bold"><i class="me-2 fas fa-graduation-cap"></i>{% trans 'Applicant Info' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'School:' %} </strong>{% trans 'Hawas Preparatory School' %}</p>
-                    <p><strong>{% trans 'Level:' %} </strong>{{ level.level }}</p>
-                </div>
-                {% endif %}
-    
-                <hr>
-                <p class="fw-bold"><i class="me-2 fas fa-phone-square-alt"></i>{% trans 'Contact Info' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'Email:' %}</strong> {{ user.email }}</p>
-                    <p><strong>{% trans 'Tel No.:' %}</strong> {{ user.phone }}</p>
-                    <p><strong>{% trans 'Address/city:' %}</strong> {{ user.address }}</p>
-                </div>
-    
-                <hr>
-                <p class="fw-bold"><i class="me-2 fa fa-calendar-day"></i>{% trans 'Important Dates' %}</p>
-                <div class="dashboard-description">
-                    <p><strong>{% trans 'Last login:' %}</strong> {{ user.last_login }}</p>
-                    {% if current_semester and current_session %}
-                    <p><strong>{% trans 'Academic Year:' %}</strong> {{ current_semester }} {% trans 'Semester' %} {{ current_session }}</p>
-                    {% endif %}
-                    <p><strong>{% trans 'Registered Date:' %}</strong> {{ user.date_joined|date }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-3 mx-auto"></div>
+                    <h3>
+                        {% if user.get_full_name %}
+                            {{ user.get_full_name|title }}
+                        {% else %}
+                            {{ user.username }}
+                        {% endif %}
+                    </h3>
+
+                    <p>@{{ user.username }}</p>
+
+                    <span class="profile-role">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        {{ user.get_user_role }}
+                    </span>
+
+                </div>
+
+
+                <!-- PROFILE ACTIONS -->
+
+                <div class="profile-actions">
+
+                    <a href="{% url 'edit_profile' %}"
+                       class="profile-action">
+
+                        <i class="fas fa-user-edit"></i>
+                        <span>{% trans 'Edit Profile' %}</span>
+
+                    </a>
+
+                    <a href="{% url 'change_password' %}"
+                       class="profile-action">
+
+                        <i class="fas fa-lock"></i>
+                        <span>{% trans 'Change Password' %}</span>
+
+                    </a>
+
+                    <a href="{% url 'logout' %}"
+                       class="profile-action">
+
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>{% trans 'Logout' %}</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCOUNT STATUS -->
+
+            <div class="profile-card">
+
+                <div class="profile-section">
+
+                    <div class="profile-section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+
+                        <h5>{% trans 'Account Status' %}</h5>
+                    </div>
+
+                    <div class="profile-info-item">
+
+                        <span class="info-label">
+                            {% trans 'Account' %}
+                        </span>
+
+                        <span class="info-value">
+                            {% if user.is_active %}
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle"></i>
+                                    {% trans 'Active' %}
+                                </span>
+                            {% else %}
+                                <span class="text-danger">
+                                    {% trans 'Inactive' %}
+                                </span>
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT INFORMATION SECTION -->
+
+        <div class="col-lg-8 col-xl-9">
+
+            <div class="profile-card">
+
+                <!-- PERSONAL INFORMATION -->
+
+                <div class="profile-section">
+
+                    <div class="profile-section-title">
+
+                        <div class="section-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+
+                        <h5>{% trans 'Personal Information' %}</h5>
+
+                    </div>
+
+
+                    <div class="profile-info-grid">
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                {% trans 'First Name' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.first_name|default:"Not provided"|title }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                {% trans 'Last Name' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.last_name|default:"Not provided"|title }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                {% trans 'Username' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.username }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                {% trans 'Role' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.get_user_role }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <hr class="profile-divider">
+
+
+                <!-- CONTACT INFORMATION -->
+
+                <div class="profile-section">
+
+                    <div class="profile-section-title">
+
+                        <div class="section-icon">
+                            <i class="fas fa-address-book"></i>
+                        </div>
+
+                        <h5>{% trans 'Contact Information' %}</h5>
+
+                    </div>
+
+
+                    <div class="profile-info-grid">
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                <i class="fas fa-envelope me-1"></i>
+                                {% trans 'Email Address' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.email|default:"Not provided" }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                <i class="fas fa-phone me-1"></i>
+                                {% trans 'Phone Number' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.phone|default:"Not provided" }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {% trans 'Address / City' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.address|default:"Not provided" }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% if user.is_student %}
+
+                    <hr class="profile-divider">
+
+                    <!-- STUDENT INFORMATION -->
+
+                    <div class="profile-section">
+
+                        <div class="profile-section-title">
+
+                            <div class="section-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+
+                            <h5>{% trans 'Academic Information' %}</h5>
+
+                        </div>
+
+
+                        <div class="profile-info-grid">
+
+                            <div class="profile-info-item">
+
+                                <span class="info-label">
+                                    {% trans 'Level' %}
+                                </span>
+
+                                <span class="info-value">
+                                    {{ level.level|default:"Not assigned" }}
+                                </span>
+
+                            </div>
+
+                            {% if current_semester %}
+                                <div class="profile-info-item">
+
+                                    <span class="info-label">
+                                        {% trans 'Current Semester' %}
+                                    </span>
+
+                                    <span class="info-value">
+                                        {{ current_semester }}
+                                    </span>
+
+                                </div>
+                            {% endif %}
+
+                            {% if current_session %}
+                                <div class="profile-info-item">
+
+                                    <span class="info-label">
+                                        {% trans 'Academic Session' %}
+                                    </span>
+
+                                    <span class="info-value">
+                                        {{ current_session }}
+                                    </span>
+
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                {% if user.is_lecturer %}
+
+                    <hr class="profile-divider">
+
+                    <!-- LECTURER COURSES -->
+
+                    <div class="profile-section">
+
+                        <div class="profile-section-title">
+
+                            <div class="section-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+
+                            <h5>{% trans 'My Courses' %}</h5>
+
+                        </div>
+
+
+                        {% if courses %}
+
+                            {% for course in courses %}
+
+                                <a href="{{ course.get_absolute_url }}"
+                                   class="profile-course">
+
+                                    <i class="fas fa-book me-2"></i>
+                                    {{ course }}
+
+                                    <i class="fas fa-arrow-right float-end"></i>
+
+                                </a>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <div class="profile-empty">
+                                {% trans 'No courses assigned yet.' %}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <hr class="profile-divider">
+
+
+                <!-- ACCOUNT ACTIVITY -->
+
+                <div class="profile-section">
+
+                    <div class="profile-section-title">
+
+                        <div class="section-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+
+                        <h5>{% trans 'Account Activity' %}</h5>
+
+                    </div>
+
+
+                    <div class="profile-info-grid">
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                {% trans 'Last Login' %}
+                            </span>
+
+                            <span class="info-value">
+
+                                {% if user.last_login %}
+                                    {{ user.last_login|date:"M d, Y - h:i A" }}
+                                {% else %}
+                                    {% trans 'First login' %}
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="profile-info-item">
+
+                            <span class="info-label">
+                                {% trans 'Registration Date' %}
+                            </span>
+
+                            <span class="info-value">
+                                {{ user.date_joined|date:"M d, Y" }}
+                            </span>
+
+                        </div>
+
+
+                        {% if current_semester and current_session %}
+
+                            <div class="profile-info-item">
+
+                                <span class="info-label">
+                                    {% trans 'Academic Period' %}
+                                </span>
+
+                                <span class="info-value">
+                                    {{ current_semester }}
+                                    -
+                                    {{ current_session }}
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-footer">
+                    SkyLearn Learning Management System
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
+
 {% endif %}
 
 {% endblock content %}
